@@ -165,6 +165,55 @@ public class BulletSystemEditor : Editor
                 EditorGUILayout.PropertyField(_target, GUIContent.none);
                 GUILayout.EndHorizontal();
                 break;
+            case BulletSystem.PatternType.Circular:
+                DrawTitleLabel("Circular Pattern");
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(new GUIContent("Precition:", "The number of dots that the circle will have. Takes absolute value, set to 1 if recieves 0."));
+                EditorGUILayout.PropertyField(_numberOfColumns, GUIContent.none);
+                _numberOfColumns.intValue = _numberOfColumns.intValue == 0 ? 1 : Mathf.Abs(_numberOfColumns.intValue);
+                GUILayout.Label(new GUIContent("Fire Rate:", "The time in seconds each bullet is shot. Takes absolute value, set to 0.1 if recieves 0."));
+                EditorGUILayout.PropertyField(_fireRate, GUIContent.none);
+                _fireRate.floatValue = _fireRate.floatValue == 0 ? 0.1f : Mathf.Abs(_fireRate.floatValue);
+                GUILayout.EndHorizontal();
+                break;
+
+            case BulletSystem.PatternType.SingleSpiral:
+                DrawTitleLabel("Spiral Pattern");
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(new GUIContent("Spin Speed:", "The speed that the spiral will rotate. Takes absolute value."));
+                EditorGUILayout.PropertyField(_spinSpeed, GUIContent.none);
+                _spinSpeed.floatValue = Mathf.Abs(_spinSpeed.floatValue);
+                GUILayout.Label(new GUIContent("Fire Rate:", "The time in seconds each bullet is shot. Takes absolute value, set to 0.1 if recieves 0."));
+                EditorGUILayout.PropertyField(_fireRate, GUIContent.none);
+                _fireRate.floatValue = _fireRate.floatValue == 0 ? 0.1f : Mathf.Abs(_fireRate.floatValue);
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                EditorGUILayout.PropertyField(_useReversedSpiral, new GUIContent("Use Reversed Spiral:", "Spawns a second spiral with inverse rotation."));
+                GUILayout.EndHorizontal();
+                break;
+
+            case BulletSystem.PatternType.MultiSpiral:
+                DrawTitleLabel("Polygonal Pattern");
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(new GUIContent("Spirals:", "The number of spirals that the pattern will have. Takes absolute value, set to 1 if recieves 0."));
+                EditorGUILayout.PropertyField(_numberOfColumns, GUIContent.none);
+                _numberOfColumns.intValue = _numberOfColumns.intValue == 0 ? 1 : Mathf.Abs(_numberOfColumns.intValue);
+                GUILayout.Label(new GUIContent("Fire Rate:", "The time in seconds each bullet is shot. Takes absolute value, set to 0.1 if recieves 0."));
+                EditorGUILayout.PropertyField(_fireRate, GUIContent.none);
+                _fireRate.floatValue = _fireRate.floatValue == 0 ? 0.1f : Mathf.Abs(_fireRate.floatValue);
+                GUILayout.Label(new GUIContent("Spin Speed:", "The speed that the spirals will rotate. Takes absolute value."));
+                EditorGUILayout.PropertyField(_spinSpeed, GUIContent.none);
+                _spinSpeed.floatValue = Mathf.Abs(_spinSpeed.floatValue);
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                EditorGUILayout.PropertyField(_useReversedSpiral, new GUIContent("Use Reversed Spiral:", "Spawns a second spiral with inverse rotation."));
+                GUILayout.EndHorizontal();
+                break;
         }
 
         // Test section

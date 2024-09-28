@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Rendering.VirtualTexturing;
 
 public class BulletSystem : MonoBehaviour
 {
@@ -282,6 +281,15 @@ public class BulletSystem : MonoBehaviour
             case PatternType.TargetShoot:
                 InitTargetShoot();
                 break;
+            case PatternType.Circular:
+                InitCircular();
+                break;
+            case PatternType.SingleSpiral:
+                InitSingleSpiral();
+                break;
+            case PatternType.MultiSpiral:
+                InitMultiSpiral();
+                break;
         }
     }
 
@@ -355,6 +363,59 @@ public class BulletSystem : MonoBehaviour
         // Instantiate the spawner and start following the target
         var spawner = InstantiateSpawner(_spawnerName, false);
         StartCoroutine(FollowTarget(spawner));
+    }
+
+    private void InitCircular()
+    {
+        _spinSpeed = 0; // Circular pattern does not spin
+
+        // Default name
+        if (_spawnerName == string.Empty) _spawnerName = "Circular";
+
+        // Instantiate the spawner
+        InstantiateSpawner(_spawnerName, false);
+    }
+
+    private void InitSingleSpiral()
+    {
+        _numberOfColumns = 1; // Single Spiral only shoots one column
+
+        // Default name
+        if (_spawnerName == string.Empty) _spawnerName = "SingleSpiral";
+
+        if (_useReversedSpiral)
+        {
+            var originalSpiral = InstantiateSpawner(_spawnerName, true);
+            StartCoroutine(SpinSpawner(originalSpiral, 1));
+
+            var reversedSpiral = InstantiateSpawner(_spawnerName, false);
+            StartCoroutine(SpinSpawner(reversedSpiral, -1));
+        }
+        else
+        {
+            var spawner = InstantiateSpawner(_spawnerName, false);
+            StartCoroutine(SpinSpawner(spawner, 1));
+        }
+    }
+
+    private void InitMultiSpiral()
+    {
+        // Default name
+        if (_spawnerName == string.Empty) _spawnerName = "MultiSpiral";
+
+        if (_useReversedSpiral)
+        {
+            var originalSpiral = InstantiateSpawner(_spawnerName, true);
+            StartCoroutine(SpinSpawner(originalSpiral, 1));
+
+            var reversedSpiral = InstantiateSpawner(_spawnerName, false);
+            StartCoroutine(SpinSpawner(reversedSpiral, -1));
+        }
+        else
+        {
+            var spawner = InstantiateSpawner(_spawnerName, false);
+            StartCoroutine(SpinSpawner(spawner, 1));
+        }
     }
     #endregion
 
@@ -446,19 +507,22 @@ public class BulletSystem : MonoBehaviour
         // Travel through all the spawners
         foreach (Transform spawner in transform)
         {
-            // Travel through all the particle systems of the spawner
-            foreach (Transform child in spawner)
+            if (spawner.name != "Stopped")
             {
-                _particleSystem = child.GetComponent<ParticleSystem>();
-                if (_particleSystem != null)
+                // Travel through all the particle systems of the spawner
+                foreach (Transform child in spawner)
                 {
-                    var emitParams = new ParticleSystem.EmitParams()
+                    _particleSystem = child.GetComponent<ParticleSystem>();
+                    if (_particleSystem != null)
                     {
-                        startColor = _useColor ? _bulletColor : Color.white,
-                        startSize = _bulletSize,
-                        startLifetime = _bulletLifeTime
-                    };
-                    _particleSystem.Emit(emitParams, 1);
+                        var emitParams = new ParticleSystem.EmitParams()
+                        {
+                            startColor = _useColor ? _bulletColor : Color.white,
+                            startSize = _bulletSize,
+                            startLifetime = _bulletLifeTime
+                        };
+                        _particleSystem.Emit(emitParams, 1);
+                    }
                 }
             }
         }
@@ -480,6 +544,14 @@ public class BulletSystem : MonoBehaviour
         }
     }
 
+    private IEnumerator SpinSpawner(Transform spawner, int direction)
+    {
+        while (spawner != null)
+        {
+            spawner.Rotate(0, 0, _spinSpeed * direction * Time.deltaTime * LocalTime.TimeScale);
+            yield return null;
+        }
+    }
 
     private IEnumerator DestroySpawners()
     {
